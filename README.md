@@ -66,7 +66,7 @@ microsservicos-demo/
 
 ### Pré-requisitos
 
-- Java 17+
+- Java 21+
 - Maven
 - RabbitMQ rodando localmente
   ```bash
@@ -130,22 +130,6 @@ Cadastra um cliente e dispara notificação.
   "email": "mayara@email.com"
 }
 ```
-
-## 🐞 Solução de Problemas
-
-| Erro                               | Solução                                      |
-|------------------------------------|-----------------------------------------------|
-| `Cannot resolve method 'getEmail'` | Adicione o método getter ou use Lombok `@Data`|
-| `'Queue' is abstract`              | Importe `org.springframework.amqp.core.Queue` |
-| `RabbitMQ Connection refused`      | Verifique se o RabbitMQ está rodando localmente |
-| `Port 8080 already in use`         | Altere a porta no `application.properties`     |
-
-## 📚 Próximos Passos
-
-- Adicionar Swagger (OpenAPI)
-- Usar PostgreSQL com Docker
-- Adicionar testes unitários com JUnit
-- Publicar como portfólio no GitHub Pages ou README interativo
 
 ## 👩‍💻 Autora
 
