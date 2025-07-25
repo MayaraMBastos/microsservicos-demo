@@ -37,13 +37,13 @@ D --> E[Console: "Email enviado para cliente@email.com"]
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Java 17**
+- **Java 21**
 - **Spring Boot 3.x**
 - **Spring Web**
 - **Spring Data JPA**
 - **RabbitMQ (mensageria)**
-- **H2 Database** (ou PostgreSQL)
-- **Docker / Docker Compose (opcional)**
+- **MySQL** (ou PostgreSQL)
+- **Docker / Docker Compose**
 
 ## 📁 Estrutura de Pastas
 
@@ -67,10 +67,10 @@ microsservicos-demo/
 ### Pré-requisitos
 
 - Java 21+
-- Maven
-- RabbitMQ rodando localmente
+- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados
+- Não é necessário instalar MySQL ou RabbitMQ localmente — tudo será iniciado automaticamente via `docker-compose`.
   ```bash
-  docker run -d --name rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+  docker-compose up --build
   ```
 
 ### Executando os microsserviços
@@ -81,15 +81,11 @@ git clone https://github.com/seuusuario/microsservicos-demo.git
 cd microsservicos-demo
 ```
 
-2. Em dois terminais separados, execute:
+2. Na raiz do projeto, execute:
 ```bash
-cd cliente-service
-./mvnw spring-boot:run
+docker-compose up --build
 ```
-```bash
-cd notificacao-service
-./mvnw spring-boot:run
-```
+
 
 3. Faça uma requisição POST:
 ```http
