@@ -54,5 +54,21 @@ services:
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
 
+  pagamento-service:
+    build: ./pagamento-service
+    container_name: pagamento-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/clientes_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_RABBITMQ_HOST: rabbitmq
+
 volumes:
   mysql_data:
