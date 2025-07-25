@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="cliente-service" />
         <module name="notificacao-service" />
+        <module name="pagamento-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -15,6 +16,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="cliente-service" options="-parameters" />
       <module name="notificacao-service" options="-parameters" />
+      <module name="pagamento-service" options="-parameters" />
     </option>
   </component>
 </project>
