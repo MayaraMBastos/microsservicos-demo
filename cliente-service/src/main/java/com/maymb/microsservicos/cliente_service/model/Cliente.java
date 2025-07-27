@@ -2,6 +2,7 @@ package com.maymb.microsservicos.cliente_service.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 /**
@@ -25,7 +26,7 @@ public class Cliente {
      * Identificador único do cliente, gerado automaticamente.
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**

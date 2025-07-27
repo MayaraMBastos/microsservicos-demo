@@ -1,6 +1,7 @@
 package com.maymb.microsservicos.pagamento_service.messaging;
 
 import com.maymb.microsservicos.pagamento_service.model.Pagamento;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransacaoProducer {
 
+    private static final String FILA_TRANSACAO = "fila.transacao";
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
@@ -25,7 +27,7 @@ public class TransacaoProducer {
      * @param pagamento pagamento a ser processado
      */
     public void enviarParaFila(Pagamento pagamento){
-        rabbitTemplate.convertAndSend(RabbitConfig.FILA_TRANSACAO, pagamento);
+        rabbitTemplate.convertAndSend(FILA_TRANSACAO, pagamento);
         System.out.println("Pagamento enviado para análise: " + pagamento.getEmail());
     }
 }
