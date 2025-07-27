@@ -1,6 +1,6 @@
 package com.maymb.microsservicos.pagamento_service.controller;
 
-import com.maymb.microsservicos.pagamento_service.messaging.TransacaoProducer;
+import com.maymb.microsservicos.pagamento_service.messaging.PagamentoProducer;
 import com.maymb.microsservicos.pagamento_service.model.Pagamento;
 import com.maymb.microsservicos.pagamento_service.repository.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class PagamentoController {
     private PagamentoRepository repository;
 
     @Autowired
-    private TransacaoProducer producer;
+    private PagamentoProducer producer;
 
     /**
      * Endpoint para criar um novo pagamento.

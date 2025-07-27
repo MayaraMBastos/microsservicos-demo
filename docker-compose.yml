@@ -68,12 +68,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/pagamento_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
-      SPRING_RABBITMQ_HOST:
+      SPRING_RABBITMQ_HOST: rabbitmq
 
   transacao-service:
     build: ./transacao-service
     ports:
-      - "8083:8083"
+      - "8083:8080"
     depends_on:
       - rabbitmq
     restart: always

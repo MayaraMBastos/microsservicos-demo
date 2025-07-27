@@ -14,14 +14,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    public static final String FILA_TRANSACAO = "fila.transacao";
+    public static final String FILA_PAGAMENTO = "fila.pagamento";
 
     /**
      * Cria a fila que envia os pagamentos para o serviço de transações.
      */
     @Bean
     public Queue filaTransacao(){
-        return new Queue(FILA_TRANSACAO, false);
+        return new Queue(FILA_PAGAMENTO, false);
     }
 
     /**
