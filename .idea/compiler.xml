@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="cliente-service" />
+        <module name="transacao-service" />
         <module name="notificacao-service" />
         <module name="pagamento-service" />
       </profile>
@@ -17,6 +18,7 @@
       <module name="cliente-service" options="-parameters" />
       <module name="notificacao-service" options="-parameters" />
       <module name="pagamento-service" options="-parameters" />
+      <module name="transacao-service" options="-parameters" />
     </option>
   </component>
 </project>
