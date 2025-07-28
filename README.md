@@ -1,49 +1,73 @@
+# ⚙️ Microsserviços - Cadastro, Pagamento e Notificação
 
-# ⚙️ Microsserviços - Cadastro e Notificação
-
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1-green.svg)](https://spring.io/projects/spring-boot)
 [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange.svg)](https://www.rabbitmq.com/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
 
+---
+
 ## 📌 Sobre o Projeto
 
-Este projeto demonstra uma arquitetura simples de **microsserviços com Java e Spring Boot**, utilizando **RabbitMQ** como ferramenta de mensageria. Ele simula um fluxo comum em sistemas modernos: ao cadastrar um cliente, uma mensagem é enviada para outro serviço responsável por notificação (simulada com `System.out`).
+Este projeto simula um ecossistema de **microsserviços com Java + Spring Boot** focado em **cadastro de clientes**, **pagamentos** e **notificações por mensageria**, utilizando **RabbitMQ** para comunicação assíncrona e **MySQL** para persistência de dados. Os serviços são desacoplados, escaláveis e cada um tem uma responsabilidade única.
+
+---
 
 ## 🧩 Serviços Envolvidos
 
 | Serviço               | Função                                                                 |
 |----------------------|------------------------------------------------------------------------|
-| `cliente-service`     | API REST para cadastro de clientes, que envia mensagens via RabbitMQ  |
-| `notificacao-service` | Escuta mensagens da fila e simula envio de notificação (console log)  |
+| `cliente-service`     | API REST para cadastro de clientes e envio de mensagem para notificação |
+| `notificacao-service` | Consome mensagens e simula envio de e-mails no console                 |
+| `pagamento-service`   | Recebe requisições de pagamento e envia transações para outro serviço |
+| `transacao-service`   | Registra todas as transações financeiras no banco                     |
+
+---
+
+## 🔄 Fluxo de Negócio
+
+```mermaid
+sequenceDiagram
+    actor Usuário
+    participant Cliente-Service
+    participant Pagamento-Service
+    participant RabbitMQ
+    participant Transacao-Service
+    participant Notificacao-Service
+
+    Usuário->>Cliente-Service: POST /clientes
+    Cliente-Service->>RabbitMQ: envia e-mail para fila.notificacao
+    RabbitMQ->>Notificacao-Service: Envia notificação
+    Usuário->>Pagamento-Service: POST /pagamentos
+    Pagamento-Service->>RabbitMQ: envia para fila.transacao
+    RabbitMQ->>Transacao-Service: Registra a transação no banco
+```
+
+---
 
 ## 🔧 Funcionalidades
 
-- ✅ Cadastro de cliente com Spring Boot e H2/PostgreSQL
-- ✅ Envio de mensagens via RabbitMQ após criação do cliente
-- ✅ Consumo de mensagens com `@RabbitListener`
-- ✅ Estrutura modular para escalar novos serviços
-- ✅ Possível deploy com Docker e Docker Compose
+-  Cadastro de cliente via API REST
+-  Registro de pagamentos com valor e e-mail
+-  Envio e consumo de mensagens com RabbitMQ
+-  Registro de transações no serviço apropriado
+-  Deploy com Docker Compose
+-  Comunicação assíncrona desacoplada via filas
+-  Separação clara de responsabilidades
+-  Banco de dados MySQL para persistência realista
 
-## 📦 Arquitetura Geral
+---
 
-```mermaid
-graph TD
-A[POST /clientes] --> B[cliente-service]
-B --> C[RabbitMQ - fila.notificacao]
-C --> D[notificacao-service]
-D --> E[Console: "Email enviado para cliente@email.com"]
-```
+## 🧱 Arquitetura Utilizada
 
-## 🛠️ Tecnologias Utilizadas
+- **Microsserviços independentes**
+- Comunicação por **RabbitMQ**
+- Persistência com **JPA + MySQL**
+- Escopo de **mensageria orientada a eventos**
+- Estrutura modular e escalável
+- Dockerizado (serviços sobem com `docker-compose`)
 
-- **Java 21**
-- **Spring Boot 3.x**
-- **Spring Web**
-- **Spring Data JPA**
-- **RabbitMQ (mensageria)**
-- **MySQL** (ou PostgreSQL)
-- **Docker / Docker Compose**
+---
 
 ## 📁 Estrutura de Pastas
 
@@ -53,41 +77,54 @@ microsservicos-demo/
 │   ├── controller/
 │   ├── model/
 │   ├── repository/
-│   ├── messaging/
-│   └── ClienteServiceApplication.java
+│   └── messaging/
 │
 ├── notificacao-service/
 │   ├── consumer/
-│   ├── config/
-│   └── NotificacaoServiceApplication.java
+│   └── config/
+│
+├── pagamento-service/
+│   ├── controller/
+│   ├── model/
+│   ├── messaging/
+│   └── repository/
+│
+├── transacao-service/
+│   ├── messaging/
+│   ├── model/
+│   └── repository/
+│
+├── docker-compose.yml
+└── README.md
 ```
+
+---
 
 ## 🚀 Como Executar Localmente
 
 ### Pré-requisitos
 
 - Java 21+
-- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/install/) instalados
-- Não é necessário instalar MySQL ou RabbitMQ localmente — tudo será iniciado automaticamente via `docker-compose`.
-  ```bash
-  docker-compose up --build
-  ```
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-### Executando os microsserviços
+### Passos para subir o sistema
 
-1. Clone o repositório:
 ```bash
+# 1. Clone o repositório
 git clone https://github.com/seuusuario/microsservicos-demo.git
 cd microsservicos-demo
-```
 
-2. Na raiz do projeto, execute:
-```bash
+# 2. Suba os serviços
 docker-compose up --build
 ```
 
+---
 
-3. Faça uma requisição POST:
+## 📬 Testando os Endpoints
+
+### ✅ Cadastro de Cliente
+
 ```http
 POST http://localhost:8080/clientes
 Content-Type: application/json
@@ -98,37 +135,48 @@ Content-Type: application/json
 }
 ```
 
-4. Veja a notificação aparecendo no console do `notificacao-service`:
-```
-Enviando notificação para: mayara@email.com
-```
+### ✅ Enviar Pagamento
 
-## 🔐 Endpoints Disponíveis
+```http
+POST http://localhost:8082/pagamentos
+Content-Type: application/json
 
-### `cliente-service`
-
-#### POST `/clientes`
-Cadastra um cliente e dispara notificação.
-
-**Exemplo de corpo da requisição:**
-```json
 {
-  "nome": "Mayara",
-  "email": "mayara@email.com"
+  "email": "mayara@email.com",
+  "valor": 150.00
 }
 ```
 
-**Resposta:**
-```json
-{
-  "id": 1,
-  "nome": "Mayara",
-  "email": "mayara@email.com"
-}
-```
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Java 21**
+- **Spring Boot 3.x**
+- **Spring Web / JPA**
+- **RabbitMQ (AMQP)**
+- **MySQL (pode ser adaptado para PostgreSQL)**
+- **Docker e Docker Compose**
+
+---
+
+## 💡 Possíveis Expansões Futuras
+
+| Ideia                          | Descrição |
+|-------------------------------|-----------|
+|  Autenticação JWT           | Segurança nos serviços REST |
+|  Dashboard de métricas      | Spring Actuator + Prometheus + Grafana |
+|  Testes com Testcontainers  | Testes de integração reais com filas e banco |
+|  Retry e Dead Letter Queue  | Reprocessar transações com erro |
+|  Histórico de transações    | Consultar via API as transações salvas |
+|  Detecção de fraude         | Análise de transações suspeitas |
+|  Email real                 | Integração com serviço SMTP |
+|  Integração com sistemas externos de BI | Geração de relatórios ou dashboards |
+
+---
 
 ## 👩‍💻 Autora
 
 **Mayara Martinello Bastos**  
 🌐 [linkedin.com/in/mayara-martinello-bastos](https://www.linkedin.com/in/mayara-martinello-bastos)  
-📫 maybastos2021@gmail.com  
+📫 maybastos2021@gmail.com
