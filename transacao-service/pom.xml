@@ -45,6 +45,10 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<!-- Testes unitários -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
