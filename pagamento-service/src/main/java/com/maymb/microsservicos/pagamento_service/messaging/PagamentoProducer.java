@@ -26,7 +26,7 @@ public class PagamentoProducer {
      *
      * @param pagamento pagamento a ser processado
      */
-    public void enviarParaFila(Pagamento pagamento){
+    public void enviarTransacao(Pagamento pagamento){
         rabbitTemplate.convertAndSend(FILA_PAGAMENTO, pagamento);
         System.out.println("Pagamento enviado para análise: " + pagamento.getEmail());
     }
