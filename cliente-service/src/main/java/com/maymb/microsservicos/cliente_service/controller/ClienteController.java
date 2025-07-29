@@ -1,9 +1,13 @@
 package com.maymb.microsservicos.cliente_service.controller;
 
+import com.maymb.microsservicos.cliente_service.dto.ClienteDTO;
 import com.maymb.microsservicos.cliente_service.messaging.NotificacaoProducer;
 import com.maymb.microsservicos.cliente_service.model.Cliente;
-import com.maymb.microsservicos.cliente_service.repository.ClienteRepository;
+import com.maymb.microsservicos.cliente_service.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,10 +26,10 @@ import org.springframework.web.bind.annotation.*;
 public class ClienteController {
 
     /**
-     * Repositório responsável pela persistência dos dados do cliente no banco de dados.
+     * Service responsável por salvar os dados do cliente no banco de dados.
      */
     @Autowired
-    private ClienteRepository repo;
+    private ClienteService clienteService;
 
     /**
      * Componente responsável por publicar mensagens na fila de notificação.
@@ -38,13 +42,13 @@ public class ClienteController {
      * Ao salvar o cliente, uma mensagem com o e-mail é enviada para a fila "fila.notificacao",
      * que será consumida pelo serviço de notificação.
      *
-     * @param cliente objeto contendo os dados do cliente a ser cadastrado
+     * @param dto objeto contendo os dados do cliente a ser cadastrado
      * @return o cliente salvo no banco de dados
      */
     @PostMapping
-    public Cliente criar(@RequestBody Cliente cliente) {
-        Cliente salvo = repo.save(cliente);
+    public ResponseEntity<Cliente> criarCliente(@RequestBody @Valid ClienteDTO dto) {
+        Cliente salvo = clienteService.salvar(dto);
         notificacaoProducer.enviarMensagem(salvo.getEmail());
-        return salvo;
+        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 }
