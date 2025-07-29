@@ -1,8 +1,10 @@
 package com.maymb.microsservicos.cliente_service.service;
 
 import com.maymb.microsservicos.cliente_service.dto.ClienteDTO;
+import com.maymb.microsservicos.cliente_service.dto.ClienteResponseDTO;
 import com.maymb.microsservicos.cliente_service.model.Cliente;
 import com.maymb.microsservicos.cliente_service.repository.ClienteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +23,7 @@ public class ClienteService {
         this.repository = repository;
     }
     /**
-     * Metodo para criar novo cliente e salvar dados  no banco
+     * Metodo para criar novo cliente e salvar dados no banco
      *
      * @param dto  objeto de classe de transicao de dados do cliente
      */
@@ -31,4 +33,13 @@ public class ClienteService {
         cliente.setEmail(dto.getEmail());
         return repository.save(cliente);
     }
+
+    public ClienteResponseDTO buscarPorId(Long id) {
+        Cliente cliente = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente com ID " + id + " não encontrado"));
+
+        // converte entidade para DTO
+        return new ClienteResponseDTO(cliente.getId(), cliente.getNome(), cliente.getEmail());
+    }
+
 }

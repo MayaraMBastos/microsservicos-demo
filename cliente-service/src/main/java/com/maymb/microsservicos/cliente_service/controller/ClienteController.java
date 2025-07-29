@@ -1,6 +1,7 @@
 package com.maymb.microsservicos.cliente_service.controller;
 
 import com.maymb.microsservicos.cliente_service.dto.ClienteDTO;
+import com.maymb.microsservicos.cliente_service.dto.ClienteResponseDTO;
 import com.maymb.microsservicos.cliente_service.messaging.NotificacaoProducer;
 import com.maymb.microsservicos.cliente_service.model.Cliente;
 import com.maymb.microsservicos.cliente_service.service.ClienteService;
@@ -36,6 +37,12 @@ public class ClienteController {
      */
     @Autowired
     private NotificacaoProducer notificacaoProducer;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable Long id) {
+        ClienteResponseDTO dto = clienteService.buscarPorId(id);
+        return ResponseEntity.ok(dto);
+    }
 
     /**
      * Endpoint para cadastrar um novo cliente.
