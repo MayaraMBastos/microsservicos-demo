@@ -53,6 +53,13 @@ public class Cliente {
     }
 
     /**
+     * Construtor sem atributos
+     * **/
+    public Cliente(){
+
+    }
+
+    /**
      * Obtém o ID do cliente.
      *
      * @return ID do cliente
