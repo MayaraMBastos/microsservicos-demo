@@ -64,6 +64,7 @@ class ClienteControllerTest {
                 .andExpect(jsonPath("$.email").value("mayara@email.com"));
 
         verify(clienteService, times(1)).salvar(any(ClienteDTO.class));
+        verify(notificacaoProducer, times(1)).enviarMensagem("mayara@email.com");
     }
 
 
