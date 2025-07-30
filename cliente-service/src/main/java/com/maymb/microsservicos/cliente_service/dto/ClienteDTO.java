@@ -13,6 +13,11 @@ public class ClienteDTO {
         @Email(message = "Email inválido")
         private String email;
 
+        public ClienteDTO(String nome, String email) {
+                this.nome = nome;
+                this.email = email;
+        }
+
         public String getNome() {
                 return nome;
         }
