@@ -1,61 +1,68 @@
 package com.maymb.microsservicos.pagamento_service.controllerTest;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maymb.microsservicos.pagamento_service.controller.PagamentoController;
+import com.maymb.microsservicos.pagamento_service.dto.PagamentoDTO;
+import com.maymb.microsservicos.pagamento_service.dto.PagamentoResponseDTO;
 import com.maymb.microsservicos.pagamento_service.messaging.PagamentoProducer;
-import com.maymb.microsservicos.pagamento_service.model.Pagamento;
 import com.maymb.microsservicos.pagamento_service.repository.PagamentoRepository;
-
+import com.maymb.microsservicos.pagamento_service.service.PagamentoService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PagamentoController.class)
 class PagamentoControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    // A anotação @InjectMocks vai tentar criar uma instância de PagamentoController
+    // e injetar os mocks (@Mock) nele.
+    @InjectMocks
+    private PagamentoController pagamentoController;
 
-    @MockBean
-    private PagamentoRepository pagamentoRepository;
+    // Os mocks para as dependências do Controller
+    @Mock
+    private PagamentoService pagamentoService;
 
-    @MockBean
-    private PagamentoProducer pagamentoProducer;
+    @Mock
+    private PagamentoProducer producer;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    // Adicione o mock para PagamentoRepository, pois ele também é uma dependência
+    // no construtor do seu controller
+    @Mock
+    private PagamentoRepository repository;
+
+    @BeforeEach
+    void setup() {
+        // Inicializa os mocks criados acima
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void deveRealizarPagamentoComSucesso() throws Exception {
-        Pagamento pagamento = new Pagamento();
-        pagamento.setId(1L);
-        pagamento.setEmail("pagador@email.com");
-        pagamento.setValor(150.00);
+    void deveRetornarStatus201_QuandoPagamentoForCriadoComSucesso() {
+        // 1. Cenário de Teste (Setup)
+        PagamentoDTO pagamentoDTO = new PagamentoDTO("test@email.com", 100.0);
+        PagamentoResponseDTO mockResponseDTO = new PagamentoResponseDTO(1L, "test@email.com", 100.0, "SUCESSO");
 
-        when(pagamentoRepository.save(any(Pagamento.class))).thenReturn(pagamento);
+        // Defina o comportamento do mock do PagamentoService
+        when(pagamentoService.salvarPagamento(pagamentoDTO)).thenReturn(mockResponseDTO);
 
-        mockMvc.perform(post("/pagamentos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(pagamento)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value("pagador@email.com"))
-                .andExpect(jsonPath("$.valor").value(150.00));
+        // 2. Ação (Execução)
+        ResponseEntity<PagamentoResponseDTO> response = pagamentoController.realizarPagamento(pagamentoDTO);
 
-        verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
-        verify(pagamentoProducer, times(1)).enviarTransacao(any(Pagamento.class));
+        // 3. Verificação (Assert)
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(mockResponseDTO, response.getBody());
+
+        // Verifique se os métodos dos mocks foram chamados
+        verify(pagamentoService, times(1)).salvarPagamento(pagamentoDTO);
+        verify(producer, times(1)).enviarTransacao(mockResponseDTO);
+
+        // Verifique se PagamentoService é injetado corretamente
+       // assertNotNull(pagamentoController.getPagamentoService());
     }
 }
-

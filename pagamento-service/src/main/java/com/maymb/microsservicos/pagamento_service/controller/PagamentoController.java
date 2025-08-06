@@ -1,8 +1,11 @@
 package com.maymb.microsservicos.pagamento_service.controller;
 
+import com.maymb.microsservicos.pagamento_service.dto.PagamentoDTO;
+import com.maymb.microsservicos.pagamento_service.dto.PagamentoResponseDTO;
 import com.maymb.microsservicos.pagamento_service.messaging.PagamentoProducer;
 import com.maymb.microsservicos.pagamento_service.model.Pagamento;
 import com.maymb.microsservicos.pagamento_service.repository.PagamentoRepository;
+import com.maymb.microsservicos.pagamento_service.service.PagamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +23,15 @@ public class PagamentoController {
     private PagamentoRepository repository;
 
     @Autowired
+    private PagamentoService pagamentoService;
+
+    @Autowired
     private PagamentoProducer producer;
 
 
-    public PagamentoController(PagamentoRepository repository, PagamentoProducer producer) {
+    public PagamentoController(PagamentoRepository repository, PagamentoService pagamentoService, PagamentoProducer producer) {
         this.repository = repository;
+        this.pagamentoService = pagamentoService;
         this.producer = producer;
     }
 
@@ -36,9 +43,9 @@ public class PagamentoController {
      */
 
     @PostMapping
-    public ResponseEntity<Pagamento> realizarPagamento(@RequestBody Pagamento pagamento) {
-        Pagamento pagamentoSalvo = repository.save(pagamento);
-        producer.enviarTransacao(pagamentoSalvo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pagamentoSalvo);
+    public ResponseEntity<PagamentoResponseDTO> realizarPagamento(@RequestBody PagamentoDTO pagamento) {
+        PagamentoResponseDTO responseDTO = pagamentoService.salvarPagamento(pagamento);
+        producer.enviarTransacao(responseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 }

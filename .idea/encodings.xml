@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/cliente-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cliente-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notificacao-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notificacao-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/pagamento-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pagamento-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/transacao-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/transacao-service/src/main/resources" charset="UTF-8" />
   </component>
 </project>

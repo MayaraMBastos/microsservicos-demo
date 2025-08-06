@@ -1,6 +1,15 @@
-version: "3.8"
+
 
 services:
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
 
   mysql:
     image: mysql:8
@@ -8,7 +17,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -26,15 +35,22 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   cliente-service:
     build: ./cliente-service
     container_name: cliente-service
     depends_on:
+      eureka-server:
+        condition: service_started
       mysql:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
@@ -42,26 +58,32 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_RABBITMQ_HOST: rabbitmq
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
   notificacao-service:
     build: ./notificacao-service
     container_name: notificacao-service
     depends_on:
-      rabbitmq:
+      eureka-server:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "8081:8080"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
   pagamento-service:
     build: ./pagamento-service
     container_name: pagamento-service
     depends_on:
+      eureka-server:
+        condition: service_started
       mysql:
         condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8082:8080"
     environment:
@@ -69,16 +91,21 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_RABBITMQ_HOST: rabbitmq
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
   transacao-service:
     build: ./transacao-service
+    container_name: transacao-service
     ports:
       - "8083:8080"
     depends_on:
-      - rabbitmq
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: always
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
 
 volumes:
   mysql_data:
-
-

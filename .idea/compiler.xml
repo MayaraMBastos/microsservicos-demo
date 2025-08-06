@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="cliente-service" />
         <module name="transacao-service" />
+        <module name="eureka-server" />
         <module name="notificacao-service" />
         <module name="pagamento-service" />
       </profile>
@@ -16,6 +17,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="cliente-service" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
       <module name="notificacao-service" options="-parameters" />
       <module name="pagamento-service" options="-parameters" />
       <module name="transacao-service" options="-parameters" />

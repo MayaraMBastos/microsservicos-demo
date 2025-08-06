@@ -1,8 +1,8 @@
 package com.maymb.microsservicos.pagamento_service.messagingTest;
 
-
+import com.maymb.microsservicos.pagamento_service.dto.ClienteDTO;
+import com.maymb.microsservicos.pagamento_service.dto.PagamentoResponseDTO;
 import com.maymb.microsservicos.pagamento_service.messaging.PagamentoProducer;
-import com.maymb.microsservicos.pagamento_service.model.Pagamento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,15 +23,17 @@ class PagamentoProducerTest {
 
     @Test
     void deveEnviarPagamentoParaFila() {
-        Pagamento pagamento = new Pagamento();
+        ClienteDTO cliente = new ClienteDTO();
+        cliente.setNome("Mayara");
+        cliente.setEmail("cliente@email.com");
+
+        PagamentoResponseDTO pagamento = new PagamentoResponseDTO();
         pagamento.setId(1L);
-        pagamento.setEmail("cliente@email.com");
         pagamento.setValor(150.0);
+        pagamento.setCliente(cliente);
 
         pagamentoProducer.enviarTransacao(pagamento);
 
-        verify(rabbitTemplate, times(1))
-                .convertAndSend("fila.pagamento", pagamento);
+        verify(rabbitTemplate, times(1)).convertAndSend("fila.pagamento", pagamento);
     }
 }
-
