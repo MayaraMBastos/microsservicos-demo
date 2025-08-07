@@ -54,9 +54,20 @@ public class ClienteController {
      * @return o cliente salvo no banco de dados
      */
     @PostMapping
-    public ResponseEntity<Cliente> criarCliente(@RequestBody @Valid ClienteDTO dto) {
-        Cliente salvo = clienteService.salvar(dto);
-        notificacaoProducer.enviarMensagem(salvo.getEmail());
-        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    public ResponseEntity<ClienteResponseDTO> cadastrar(@RequestBody @Valid ClienteDTO dto) {
+        // O serviço retorna a entidade Cliente
+        Cliente clienteSalvo = clienteService.salvar(dto);
+
+        // CONVERSÃO NECESSÁRIA: Converta a entidade para DTO
+        ClienteResponseDTO responseDto = new ClienteResponseDTO(
+                clienteSalvo.getId(),
+                clienteSalvo.getNome(),
+                clienteSalvo.getEmail()
+        );
+
+        // Retorna o DTO na resposta
+        notificacaoProducer.enviarMensagem(responseDto.getEmail());
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
+
 }

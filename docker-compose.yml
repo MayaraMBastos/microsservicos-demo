@@ -46,7 +46,7 @@ services:
     container_name: cliente-service
     depends_on:
       eureka-server:
-        condition: service_started
+        condition: service_healthy
       mysql:
         condition: service_healthy
       rabbitmq:
@@ -65,7 +65,7 @@ services:
     container_name: notificacao-service
     depends_on:
       eureka-server:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     ports:
@@ -79,7 +79,7 @@ services:
     container_name: pagamento-service
     depends_on:
       eureka-server:
-        condition: service_started
+        condition: service_healthy
       mysql:
         condition: service_healthy
       rabbitmq:
@@ -100,7 +100,7 @@ services:
       - "8083:8080"
     depends_on:
       eureka-server:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     restart: always

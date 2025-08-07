@@ -1,5 +1,7 @@
 package com.maymb.microsservicos.cliente_service.dto;
 
+import java.util.Objects;
+
 public class ClienteResponseDTO {
     private Long id;
     private String nome;
@@ -12,6 +14,21 @@ public class ClienteResponseDTO {
     }
 
     public ClienteResponseDTO() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClienteResponseDTO that = (ClienteResponseDTO) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(nome, that.nome) &&
+                Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome, email);
     }
 
     public Long getId() {
