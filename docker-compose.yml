@@ -1,7 +1,4 @@
-
-
 services:
-
   eureka-server:
     build: ./eureka-server
     container_name: eureka-server
@@ -11,20 +8,19 @@ services:
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
       EUREKA_CLIENT_FETCH_REGISTRY: "false"
 
-  mysql:
+  mysqlDb:
     image: mysql:8
-    container_name: mysql
+    container_name: mysqlDb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-    command: --default-authentication-plugin=mysql_native_password
-    volumes:
-      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysqlDb", "-u", "root", "-p123456"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - microsservicos-network
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -40,58 +36,50 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - microsservicos-network
 
   cliente-service:
     build: ./cliente-service
     container_name: cliente-service
     depends_on:
       eureka-server:
-        condition: service_healthy
-      mysql:
+        condition: service_started
+      mysqlDb:
         condition: service_healthy
       rabbitmq:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/clientes_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlDb:3306/clientes_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_RABBITMQ_HOST: rabbitmq
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
-
-  notificacao-service:
-    build: ./notificacao-service
-    container_name: notificacao-service
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - microsservicos-network
 
   pagamento-service:
     build: ./pagamento-service
     container_name: pagamento-service
     depends_on:
       eureka-server:
-        condition: service_healthy
-      mysql:
+        condition: service_started
+      mysqlDb:
         condition: service_healthy
       rabbitmq:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "8082:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/pagamento_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlDb:3306/pagamento_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
       SPRING_RABBITMQ_HOST: rabbitmq
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - microsservicos-network
 
   transacao-service:
     build: ./transacao-service
@@ -100,12 +88,33 @@ services:
       - "8083:8080"
     depends_on:
       eureka-server:
-        condition: service_healthy
+        condition: service_started
       rabbitmq:
-        condition: service_healthy
-    restart: always
+        condition: service_started
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - microsservicos-network
+
+  notificacao-service:
+    build: ./notificacao-service
+    container_name: notificacao-service
+    depends_on:
+      eureka-server:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - microsservicos-network
 
 volumes:
   mysql_data:
+
+networks:
+  microsservicos-network:
+    driver: bridge

@@ -1,9 +1,15 @@
 package com.maymb.microsservicos.transacao_service.model;
 
+import jakarta.persistence.*;
+
 /**
  * Representa os dados recebidos de um pagamento da fila.
  */
-public class Pagamento {
+@Entity
+@Table(name = "pagamentos")
+public class Pagamento{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     private Double valor;

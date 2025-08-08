@@ -8,7 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransacaoConsumer {
 
+    private final TransacaoRepository transacaoRepository;
+
     public TransacaoConsumer(TransacaoRepository transacaoRepository) {
+        this.transacaoRepository = transacaoRepository;
     }
 
     @RabbitListener(queues = RabbitConfig.FILA_TRANSACAO)
@@ -16,7 +19,9 @@ public class TransacaoConsumer {
         System.out.printf(" Transação recebida: ID=%d | Email=%s | Valor=R$ %.2f%n",
                 pagamento.getId(), pagamento.getEmail(), pagamento.getValor());
 
-        // Aqui poderia estar a lógica para validar ou integrar com operadora, etc.
-        System.out.println("Transação aprovada!");
+        // Lógica de persistência adicionada
+        transacaoRepository.save(pagamento);
+
+        System.out.println("Transação aprovada e salva no banco de dados!");
     }
 }
